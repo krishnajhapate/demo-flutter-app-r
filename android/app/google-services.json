@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "525309917707",
+    "project_id": "recursive-demo",
+    "storage_bucket": "recursive-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525309917707:android:4e07b7698157b1008da50e",
+        "android_client_info": {
+          "package_name": "com.app.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF32ZaPYSGJno1GiSLbzuAhp2fo61wK4Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
