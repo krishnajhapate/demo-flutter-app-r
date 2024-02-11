@@ -87,9 +87,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Login',
-          textAlign: TextAlign.center,
+        title: Center(
+          child: Text(
+            'Login',
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
       body: Padding(
