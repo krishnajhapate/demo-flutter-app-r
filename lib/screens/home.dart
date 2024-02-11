@@ -68,17 +68,26 @@ class _HomePageState extends State<HomePage> {
       query = query.where('dob', isLessThanOrEqualTo: endDate);
     }
 
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument!);
+    }
     // Execute query
     QuerySnapshot querySnapshot = await query.limit(documentLimit).get();
 
     // Update students list
     if (querySnapshot.docs.isNotEmpty) {
-      lastDocument = querySnapshot.docs.last;
-      students.addAll(
+      print("WEHE ARE NEW ");
+
+      List<Student> ls = students;
+      ls.addAll(
         querySnapshot.docs
             .map((doc) => Student.fromMap(doc.data() as Map<String, dynamic>))
             .toList(),
       );
+      setState(() {
+        students = ls;
+        lastDocument = querySnapshot.docs.last;
+      });
     }
 
     // Update hasMore flag
@@ -94,9 +103,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _refreshData() async {
-    students.clear();
-    lastDocument = null;
-    hasMore = true;
+    setState(() {
+      students.clear();
+      lastDocument = null;
+      hasMore = true;
+    });
+
     await fetchData();
   }
 
@@ -192,11 +204,8 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     return ExpansionTile(
                       leading: CircleAvatar(
-                        child: Text(
-                          students[index].name.substring(
-                              0, 1), // Extract the first letter of the name
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        backgroundImage: NetworkImage(students[index].avatar ??
+                            "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/32.jpg"),
                         backgroundColor: Colors
                             .blue, // Change the background color of the CircleAvatar
                       ),
