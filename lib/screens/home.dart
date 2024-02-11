@@ -1,5 +1,7 @@
 import 'package:app/models/student.dart';
+import 'package:app/screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   late List<Student> students = [];
   bool isLoading = false;
   bool hasMore = true;
@@ -121,6 +125,17 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              _handleSignOut(context);
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
@@ -247,6 +262,19 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSignOut(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      // Navigate back to the login screen or any other screen as needed
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } catch (e) {
+      // Handle sign out errors
+      print('Error signing out: $e');
+    }
   }
 
   Widget _buildProgressIndicator() {
