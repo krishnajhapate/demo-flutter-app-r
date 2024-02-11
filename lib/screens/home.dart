@@ -58,50 +58,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (searchQuery.isNotEmpty) {
-      String searchLowerCase = searchQuery.toLowerCase();
-      String searchUpperCase = searchQuery.toUpperCase();
-
-      // Search on all fields
       query = query
-          .where('name', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('name', isLessThan: searchLowerCase + 'z')
-          .where('name', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('name', isLessThan: searchUpperCase + 'z')
-          .where('classRoom', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('classRoom', isLessThan: searchLowerCase + 'z')
-          .where('classRoom', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('classRoom', isLessThan: searchUpperCase + 'z')
-          .where('address', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('address', isLessThan: searchLowerCase + 'z')
-          .where('address', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('address', isLessThan: searchUpperCase + 'z')
-          .where('phone', isEqualTo: searchQuery)
-          .where('phone', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('phone', isLessThan: searchLowerCase + 'z')
-          .where('phone', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('phone', isLessThan: searchUpperCase + 'z')
-          .where('email', isEqualTo: searchQuery)
-          .where('email', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('email', isLessThan: searchLowerCase + 'z')
-          .where('email', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('email', isLessThan: searchUpperCase + 'z')
-          .where('parentsName', isEqualTo: searchQuery)
-          .where('parentsName', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('parentsName', isLessThan: searchLowerCase + 'z')
-          .where('parentsName', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('parentsName', isLessThan: searchUpperCase + 'z')
-          .where('mothersName', isEqualTo: searchQuery)
-          .where('mothersName', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('mothersName', isLessThan: searchLowerCase + 'z')
-          .where('mothersName', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('mothersName', isLessThan: searchUpperCase + 'z')
-          .where('dob', isEqualTo: searchQuery)
-          .where('dob', isGreaterThanOrEqualTo: searchLowerCase)
-          .where('dob', isLessThan: searchLowerCase + 'z')
-          .where('dob', isGreaterThanOrEqualTo: searchUpperCase)
-          .where('dob', isLessThan: searchUpperCase + 'z');
+          .where('name', isGreaterThanOrEqualTo: searchQuery)
+          .where('name', isLessThan: searchQuery + 'z');
     }
-
     print("$startDate $endDate");
 
     if (startDate != null) {
