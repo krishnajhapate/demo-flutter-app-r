@@ -1,5 +1,7 @@
 import 'package:app/models/student.dart';
+import 'package:app/screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   late List<Student> students = [];
   bool isLoading = false;
   bool hasMore = true;
@@ -54,10 +58,50 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (searchQuery.isNotEmpty) {
+      String searchLowerCase = searchQuery.toLowerCase();
+      String searchUpperCase = searchQuery.toUpperCase();
+
+      // Search on all fields
       query = query
-          .where('name', isGreaterThanOrEqualTo: searchQuery)
-          .where('name', isLessThan: searchQuery + 'z');
+          .where('name', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('name', isLessThan: searchLowerCase + 'z')
+          .where('name', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('name', isLessThan: searchUpperCase + 'z')
+          .where('classRoom', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('classRoom', isLessThan: searchLowerCase + 'z')
+          .where('classRoom', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('classRoom', isLessThan: searchUpperCase + 'z')
+          .where('address', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('address', isLessThan: searchLowerCase + 'z')
+          .where('address', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('address', isLessThan: searchUpperCase + 'z')
+          .where('phone', isEqualTo: searchQuery)
+          .where('phone', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('phone', isLessThan: searchLowerCase + 'z')
+          .where('phone', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('phone', isLessThan: searchUpperCase + 'z')
+          .where('email', isEqualTo: searchQuery)
+          .where('email', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('email', isLessThan: searchLowerCase + 'z')
+          .where('email', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('email', isLessThan: searchUpperCase + 'z')
+          .where('parentsName', isEqualTo: searchQuery)
+          .where('parentsName', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('parentsName', isLessThan: searchLowerCase + 'z')
+          .where('parentsName', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('parentsName', isLessThan: searchUpperCase + 'z')
+          .where('mothersName', isEqualTo: searchQuery)
+          .where('mothersName', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('mothersName', isLessThan: searchLowerCase + 'z')
+          .where('mothersName', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('mothersName', isLessThan: searchUpperCase + 'z')
+          .where('dob', isEqualTo: searchQuery)
+          .where('dob', isGreaterThanOrEqualTo: searchLowerCase)
+          .where('dob', isLessThan: searchLowerCase + 'z')
+          .where('dob', isGreaterThanOrEqualTo: searchUpperCase)
+          .where('dob', isLessThan: searchUpperCase + 'z');
     }
+
     print("$startDate $endDate");
 
     if (startDate != null) {
@@ -68,17 +112,26 @@ class _HomePageState extends State<HomePage> {
       query = query.where('dob', isLessThanOrEqualTo: endDate);
     }
 
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument!);
+    }
     // Execute query
     QuerySnapshot querySnapshot = await query.limit(documentLimit).get();
 
     // Update students list
     if (querySnapshot.docs.isNotEmpty) {
-      lastDocument = querySnapshot.docs.last;
-      students.addAll(
+      print("WEHE ARE NEW ");
+
+      List<Student> ls = students;
+      ls.addAll(
         querySnapshot.docs
             .map((doc) => Student.fromMap(doc.data() as Map<String, dynamic>))
             .toList(),
       );
+      setState(() {
+        students = ls;
+        lastDocument = querySnapshot.docs.last;
+      });
     }
 
     // Update hasMore flag
@@ -94,9 +147,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _refreshData() async {
-    students.clear();
-    lastDocument = null;
-    hasMore = true;
+    setState(() {
+      students.clear();
+      lastDocument = null;
+      hasMore = true;
+    });
+
     await fetchData();
   }
 
@@ -109,6 +165,17 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              _handleSignOut(context);
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
@@ -192,11 +259,8 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     return ExpansionTile(
                       leading: CircleAvatar(
-                        child: Text(
-                          students[index].name.substring(
-                              0, 1), // Extract the first letter of the name
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        backgroundImage: NetworkImage(students[index].avatar ??
+                            "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/32.jpg"),
                         backgroundColor: Colors
                             .blue, // Change the background color of the CircleAvatar
                       ),
@@ -238,6 +302,19 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSignOut(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      // Navigate back to the login screen or any other screen as needed
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } catch (e) {
+      // Handle sign out errors
+      print('Error signing out: $e');
+    }
   }
 
   Widget _buildProgressIndicator() {
